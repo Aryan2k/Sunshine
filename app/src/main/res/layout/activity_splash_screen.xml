@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/splash_background"
+    tools:context=".ui.splash.SplashScreenActivity">
+
+    <TextView
+        android:id="@+id/appNameTxt"
+        style="@style/MyCustomFontTextAppearance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/noto_serif_italic"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:letterSpacing=".05"
+        android:text="@string/app_name"
+        android:textColor="@color/white"
+        android:textSize="56sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.48"
+        app:layout_constraintWidth_percent=".8" />
+</androidx.constraintlayout.widget.ConstraintLayout>

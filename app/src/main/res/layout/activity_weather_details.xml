@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bg"
+    android:background="@color/transparent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.weather.WeatherDetailsActivity">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/topCardView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:outlineProvider="bounds"
+        app:cardBackgroundColor="@android:color/transparent"
+        app:cardElevation="0dp"
+        app:layout_constraintHeight_percent="0.5"
+        app:layout_constraintWidth_percent="1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.2" />
+
+            <TextView
+                android:id="@+id/locationTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/noto_serif_italic"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:letterSpacing=".05"
+                android:textColor="@color/black_white"
+                android:textSize="28sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/guideline"
+                tools:text="Varanasi" />
+
+            <ImageView
+                android:id="@+id/locationImg"
+                android:layout_width="21dp"
+                android:layout_height="21dp"
+                android:layout_marginTop="8dp"
+                android:contentDescription="@string/locationImg"
+                android:src="@drawable/ic_location_bar"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toTopOf="@+id/currentTemp"
+                app:layout_constraintEnd_toEndOf="@+id/locationTxt"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="@+id/locationTxt"
+                app:layout_constraintTop_toBottomOf="@+id/locationTxt"
+                app:layout_constraintVertical_chainStyle="spread_inside"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/currentTemp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/noto_serif_italic"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:letterSpacing=".05"
+                android:textColor="@color/black_white"
+                android:textSize="64sp"
+                app:layout_constraintBottom_toTopOf="@+id/currentWeather"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/locationImg"
+                tools:text="30" />
+
+            <TextView
+                android:id="@+id/currentWeather"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/noto_serif_italic"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:letterSpacing=".05"
+                android:textColor="@color/black_white"
+                android:textSize="28sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/currentTemp"
+                app:layout_constraintStart_toStartOf="@+id/currentTemp"
+                tools:text="Clear" />
+
+            <TextView
+                android:id="@+id/degreeCelsiusTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="@font/noto_serif_italic"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:letterSpacing=".05"
+                android:text="@string/degree_celsius"
+                android:textColor="@color/gray_white"
+                android:textSize="40sp"
+                android:visibility="invisible"
+                app:layout_constraintStart_toEndOf="@+id/currentTemp"
+                app:layout_constraintTop_toTopOf="@+id/currentTemp"
+                tools:visibility="visible" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/bottomCardView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:cardBackgroundColor="@android:color/transparent"
+        app:layout_constraintHeight_percent="0.12"
+        app:layout_constraintWidth_percent="1"
+        android:layout_marginBottom="1dp"
+        android:outlineProvider="bounds"
+        android:visibility="invisible"
+        app:cardElevation="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:visibility="visible">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/currentVisibility"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/noto_serif_italic"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:letterSpacing=".05"
+                android:textColor="@color/black_white"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/visibilityTxt"
+                app:layout_constraintEnd_toStartOf="@+id/currentHumidity"
+                app:layout_constraintHorizontal_chainStyle="spread"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed"
+                tools:text="24℃" />
+
+            <TextView
+                android:id="@+id/visibilityTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/noto_serif_italic"
+                android:gravity="center"
+                android:layout_marginTop="2dp"
+                android:includeFontPadding="false"
+                android:letterSpacing=".05"
+                android:text="@string/visibility"
+                android:textColor="@color/gray_white"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/currentVisibility"
+                app:layout_constraintStart_toStartOf="@+id/currentVisibility"
+                app:layout_constraintTop_toBottomOf="@+id/currentVisibility" />
+
+            <TextView
+                android:id="@+id/currentHumidity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/noto_serif_italic"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:letterSpacing=".05"
+                android:textColor="@color/black_white"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/humidityTxt"
+                app:layout_constraintEnd_toStartOf="@+id/currentWindSpeed"
+                app:layout_constraintStart_toEndOf="@+id/currentVisibility"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed"
+                tools:text="29%" />
+
+            <TextView
+                android:id="@+id/humidityTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/noto_serif_italic"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:layout_marginTop="2dp"
+                android:letterSpacing=".05"
+                android:text="@string/humidity"
+                android:textColor="@color/gray_white"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/currentHumidity"
+                app:layout_constraintStart_toStartOf="@+id/currentHumidity"
+                app:layout_constraintTop_toBottomOf="@+id/currentHumidity" />
+
+            <TextView
+                android:id="@+id/currentWindSpeed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/noto_serif_italic"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:letterSpacing=".05"
+                android:textColor="@color/black_white"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/windSpeedTxt"
+                app:layout_constraintEnd_toStartOf="@+id/currentPressure"
+                app:layout_constraintStart_toEndOf="@+id/currentHumidity"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed"
+                tools:text="15 KmPH" />
+
+            <TextView
+                android:id="@+id/windSpeedTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/noto_serif_italic"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:layout_marginTop="2dp"
+                android:letterSpacing=".05"
+                android:text="@string/wind_speed"
+                android:textColor="@color/gray_white"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/currentWindSpeed"
+                app:layout_constraintStart_toStartOf="@+id/currentWindSpeed"
+                app:layout_constraintTop_toBottomOf="@+id/currentWindSpeed" />
+
+            <TextView
+                android:id="@+id/currentPressure"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/noto_serif_italic"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:letterSpacing=".05"
+                android:textColor="@color/black_white"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/pressureTxt"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/currentWindSpeed"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed"
+                tools:text="1010 hPa" />
+
+            <TextView
+                android:id="@+id/pressureTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/noto_serif_italic"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:layout_marginTop="2dp"
+                android:letterSpacing=".05"
+                android:text="@string/pressure"
+                android:textColor="@color/gray_white"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/currentPressure"
+                app:layout_constraintStart_toStartOf="@+id/currentPressure"
+                app:layout_constraintTop_toBottomOf="@+id/currentPressure" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,105 @@
+plugins
+        {
+            id 'com.android.application'
+            id 'org.jetbrains.kotlin.android'
+            id 'com.google.gms.google-services'
+            id 'com.google.firebase.crashlytics'
+            id 'com.google.firebase.firebase-perf'
+            id 'androidx.navigation.safeargs.kotlin'
+            id 'kotlin-kapt'
+            id 'com.google.dagger.hilt.android'
+        }
+
+android {
+    namespace 'com.example.vibeing'
+    compileSdk 33
+    packagingOptions {
+        resources.excludes.add("META-INF/*")
+    }
+    defaultConfig {
+        applicationId "com.example.vibeing"
+        minSdk 21
+        targetSdk 33
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    buildFeatures {
+        viewBinding true
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+}
+
+dependencies {
+
+    constraints {
+        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0") {
+            because("kotlin-stdlib-jdk7 is now a part of kotlin-stdlib")
+        }
+        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0") {
+            because("kotlin-stdlib-jdk8 is now a part of kotlin-stdlib")
+        }
+    }
+
+    implementation 'androidx.core:core-ktx:1.10.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    //Navigation
+    implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
+    implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+    //YoYo
+    implementation 'com.daimajia.androidanimations:library:2.4@aar'
+    //Room
+    def room_version = '2.5.1'
+    implementation "androidx.room:room-runtime:$room_version"
+    implementation "androidx.room:room-ktx:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
+    kapt "android.arch.persistence.room:compiler:1.1.1"
+    //Dagger-Hilt
+    implementation "com.google.dagger:hilt-android:2.44"
+    kapt "com.google.dagger:hilt-compiler:2.44"
+    implementation "androidx.activity:activity-ktx:1.7.0" //makes easy to inject things into view model
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
+    implementation 'com.github.3llomi:CircularStatusView:V1.0.3'
+    implementation 'com.makeramen:roundedimageview:2.3.0'
+    //Firebase
+    implementation platform('com.google.firebase:firebase-bom:31.1.1')
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation 'com.google.firebase:firebase-crashlytics-ktx'
+    implementation 'com.google.firebase:firebase-perf-ktx'
+    implementation 'com.google.firebase:firebase-auth-ktx'
+    implementation 'com.google.firebase:firebase-firestore-ktx'
+    implementation 'com.google.firebase:firebase-storage'
+    //Sdp
+    implementation 'com.intuit.ssp:ssp-android:1.1.0'
+    implementation 'com.intuit.sdp:sdp-android:1.1.0'
+    //Picasso
+    implementation 'com.squareup.picasso:picasso:2.71828'
+    //test dependency
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation "com.google.truth:truth:1.1.3"
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+    //android test dependency
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    androidTestImplementation "com.google.truth:truth:1.1.3"
+    androidTestImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+}
+kapt {
+    correctErrorTypes true
+}
