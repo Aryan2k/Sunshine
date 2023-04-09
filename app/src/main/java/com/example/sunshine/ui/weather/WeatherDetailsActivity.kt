@@ -22,12 +22,17 @@ import com.example.sunshine.db.entity.WeatherParams
 import com.example.sunshine.utils.Constants.API_KEY
 import com.example.sunshine.utils.FunctionUtils
 import com.example.sunshine.utils.FunctionUtils.focusScreen
+import com.example.sunshine.utils.FunctionUtils.snackBar
+import com.example.sunshine.utils.FunctionUtils.toast
 import com.example.sunshine.utils.RequestStatus
 import com.example.sunshine.viewmodel.weather.WeatherDetailActivityViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import dagger.hilt.android.AndroidEntryPoint
+import java.time.Instant
+import java.time.ZoneId
 import java.util.*
 import kotlin.math.roundToInt
 
@@ -38,7 +43,8 @@ class WeatherDetailsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityWeatherDetailsBinding
     private lateinit var viewModel: WeatherDetailActivityViewModel
     private lateinit var weatherDialog: Dialog
-    private lateinit var currentCity: String
+    private lateinit var currentCity: String   /*  keeps track of the last properly entered / retrieved city name to keep the
+                                                   locationTxt updated in case of wrong city name being entered  */
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,7 +57,7 @@ class WeatherDetailsActivity : AppCompatActivity() {
         handleLiveData()
         setUpClickListeners()
 
-        if (isLocationPermissionGranted())
+        if (isLocationPermissionGranted())  //  permission already granted
             getDeviceLocation()
     }
 
@@ -70,19 +76,19 @@ class WeatherDetailsActivity : AppCompatActivity() {
 
         cityBtn?.setOnClickListener {
             progressBar?.visibility = View.VISIBLE
-            if (cityName?.text?.isBlank() == true) {
+            if (cityName?.text?.isBlank() == true) {  //  No city name entered
                 cityContainer?.isErrorEnabled = true
                 cityContainer?.error = getString(R.string.please_enter_the_city_name)
                 progressBar?.visibility = View.INVISIBLE
                 cityContainer?.rootView?.let { it1 -> FunctionUtils.animateView(it1) }
                 FunctionUtils.vibrateDevice(binding.root.context)
-            } else {
+            } else {  //  City name entered, attempt to update weather for that city
                 weatherDialog.show()
                 cityContainer?.isErrorEnabled = false
                 binding.locationTxt.text = cityName?.text.toString().trim().replaceFirstChar { line -> if (line.isLowerCase()) line.titlecase(Locale.ROOT) else line.toString() }
                 progressBar?.visibility = View.INVISIBLE
                 dialog.dismiss()
-                viewModel.loadWeatherData(binding.locationTxt.text.toString(), API_KEY)
+                viewModel.loadWeatherData(binding.locationTxt.text.toString(), API_KEY, binding.root.context)
             }
         }
         dialog.show()
@@ -121,35 +127,34 @@ class WeatherDetailsActivity : AppCompatActivity() {
                     weatherDialog.show()
                 }
                 RequestStatus.SUCCESS -> {
-                    viewModel.getCityNameFromLocation(it.data, API_KEY)
+                    if (it.data != null)   //  location retrieved, get city name from location coordinates
+                        viewModel.getCityNameFromLocation(it.data, API_KEY, binding.root.context)
                 }
                 RequestStatus.EXCEPTION -> {
-                    FunctionUtils.toast(binding.root.context, it.message.toString())
+                    toast(binding.root.context, it.message.toString())
                     weatherDialog.dismiss()
                 }
             }
         }
     }
 
+
     private fun handleGetCityNameFromLocationLiveData() {
         viewModel.getCityNameFromLocationLiveData.observe(this) {
             with(binding) {
                 when (it.status) {
                     RequestStatus.LOADING -> {
-
                     }
                     RequestStatus.SUCCESS -> {
-                        currentCity = it.data!!.name
-                        locationTxt.text = currentCity
-                        viewModel.loadWeatherData(currentCity, API_KEY)
+                        if (it != null) {      //  city name retrieved, load the city's weather reports
+                            currentCity = it.data!!.name
+                            locationTxt.text = currentCity
+                            viewModel.loadWeatherData(currentCity, API_KEY, binding.root.context)
+                        } else {
+                            toast(binding.root.context, getString(R.string.some_error_occurred))
+                        }
                     }
-                    RequestStatus.EXCEPTION -> {  // usually no internet
-                        val snackBar = FunctionUtils.snackBar(binding.root.rootView, "Network Error: Loading last saved weather report")
-                        val view = snackBar.view
-                        val params = view.layoutParams as FrameLayout.LayoutParams
-                        params.gravity = Gravity.CENTER
-                        view.layoutParams = params
-                        snackBar.show()
+                    RequestStatus.EXCEPTION -> {   //   no internet available, load last saved weather reports from database
                         viewModel.getLastWeatherFromDb()
                         weatherDialog.dismiss()
                     }
@@ -158,18 +163,6 @@ class WeatherDetailsActivity : AppCompatActivity() {
         }
     }
 
-
-    private fun handleGetWeatherFromDbLiveData() {
-        viewModel.getWeatherFromDbLiveData.observe(this) {
-            if (it != null) {
-                updateUI(it)
-            } else {
-                FunctionUtils.snackBar(binding.root.rootView, "ERROR: Cannot retrieve last saved weather report").show()
-            }
-        }
-    }
-
-
     @RequiresApi(Build.VERSION_CODES.O)
     private fun handleLoadWeatherDataLiveData() {
         viewModel.loadWeatherDataLiveData.observe(this) {
@@ -177,19 +170,27 @@ class WeatherDetailsActivity : AppCompatActivity() {
                 RequestStatus.LOADING -> {
                 }
                 RequestStatus.SUCCESS -> {
-                    currentCity = it.data!!.name
-
-                    val weatherParams = WeatherParams(
-                        currentCity, it.data.main.temp.toString(), it.data.weather[0].description, it.data.visibility.toString(),
-                        it.data.wind.speed.toString(), it.data.main.humidity.toString(), it.data.main.pressure.toString(),
-                        it.data.sys.sunrise.toString(), it.data.sys.sunset.toString()
-                    )
-                    viewModel.clearDb()
-                    viewModel.addWeather(weatherParams)
-                    updateUI(weatherParams)
+                    if (it != null) {     //  weather reports retrieved, attempt to save it to room database
+                        currentCity = it.data!!.name
+                        val currentTime = Date().time / 1000
+                        val weatherParams = WeatherParams(
+                            currentCity, it.data.main.temp.toString(), it.data.weather[0].description, it.data.visibility.toString(),
+                            it.data.wind.speed.toString(), it.data.main.humidity.toString(), it.data.main.pressure.toString(),
+                            it.data.sys.sunrise.toString(), it.data.sys.sunset.toString(), currentTime.toString()
+                        )
+                        viewModel.clearDb()
+                        viewModel.addWeather(weatherParams)
+                        updateUI(weatherParams)
+                    } else {
+                        toast(binding.root.context, getString(R.string.some_error_occurred))
+                    }
                 }
                 RequestStatus.EXCEPTION -> {
-                    FunctionUtils.toast(binding.root.context, getString(R.string.invalid_city_name))
+                    if (it.message.toString() == getString(R.string.response_not_successful)) {
+                        toast(binding.root.context, getString(R.string.invalid_city_name))
+                    } else {
+                        toast(binding.root.context, it.message.toString())
+                    }
                     binding.locationTxt.text = currentCity
                     weatherDialog.dismiss()
                 }
@@ -197,13 +198,9 @@ class WeatherDetailsActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateUI(weatherParams: WeatherParams) {
+    private fun updateUI(weatherParams: WeatherParams) {   //  update the UI according to day or night time
 
-        val sunrise = weatherParams.sunrise
-        val sunset = weatherParams.sunset
-
-        val currentTime = Date().time / 1000
-        if (currentTime in sunrise.toLong() until sunset.toLong()) {  // day-time
+        if (weatherParams.time.toLong() in weatherParams.sunrise.toLong() until weatherParams.sunset.toLong()) {  // day-time
             setDay()
         } else {      // night-time
             setNight()
@@ -264,6 +261,32 @@ class WeatherDetailsActivity : AppCompatActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun handleGetWeatherFromDbLiveData() {
+        viewModel.getWeatherFromDbLiveData.observe(this) {
+            if (it != null) {   //  retrieved saved weather reports from database, display it
+                val dateTime = Instant.ofEpochSecond(it.time.toLong())
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime().toString().replace("T0", " ")   //  garbage value
+                setUpSnackBar(String.format(getString(R.string.no_internet_showing_reports_from), dateTime)).show()
+                currentCity = it.cityName
+                updateUI(it)
+            } else {
+                toast(binding.root.context, getString(R.string.no_internet_unable_to_retrieve))
+            }
+        }
+    }
+
+    private fun setUpSnackBar(msg: String): Snackbar {
+        val snackBar = snackBar(binding.root.rootView, msg, Snackbar.LENGTH_INDEFINITE)
+        snackBar.setAction(getString(R.string.dismiss)) { snackBar.dismiss() }
+        val view = snackBar.view
+        val params = view.layoutParams as FrameLayout.LayoutParams
+        params.gravity = Gravity.CENTER
+        view.layoutParams = params
+        return snackBar
+    }
+
     private fun isLocationPermissionGranted(): Boolean {
         return if (ActivityCompat.checkSelfPermission(
                 this,
@@ -284,6 +307,21 @@ class WeatherDetailsActivity : AppCompatActivity() {
             false
         } else {
             true
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 0) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED)
+                getDeviceLocation()
+            else {
+                snackBar(binding.root, getString(R.string.permission_denied)).show()
+            }
         }
     }
 }

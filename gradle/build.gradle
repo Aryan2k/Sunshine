@@ -90,6 +90,8 @@ dependencies {
     implementation 'com.intuit.sdp:sdp-android:1.1.0'
     //Picasso
     implementation 'com.squareup.picasso:picasso:2.71828'
+    //Ko
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     //test dependency
     testImplementation 'junit:junit:4.13.2'
     testImplementation "com.google.truth:truth:1.1.3"

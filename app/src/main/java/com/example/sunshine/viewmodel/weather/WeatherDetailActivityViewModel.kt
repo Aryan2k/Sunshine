@@ -18,25 +18,25 @@ class WeatherDetailActivityViewModel @Inject constructor(private val repository:
 
     var getDeviceLocationLiveData = MutableLiveData<Resource<Location?>>()
     fun getDeviceLocation(context: Context) {
-        getDeviceLocationLiveData.value = Resource.loading(null)
+        getDeviceLocationLiveData.postValue(Resource.loading(null))
         viewModelScope.launch {
             repository.getDeviceLocation(context, getDeviceLocationLiveData)
         }
     }
 
     var getCityNameFromLocationLiveData = MutableLiveData<Resource<WeatherModel>>()
-    fun getCityNameFromLocation(location: Location?, API_KEY: String) {
-        getCityNameFromLocationLiveData.value = Resource.loading(null)
+    fun getCityNameFromLocation(location: Location?, API_KEY: String, context: Context) {
+        getCityNameFromLocationLiveData.postValue(Resource.loading(null))
         viewModelScope.launch {
-            getCityNameFromLocationLiveData.value = repository.getCityNameFromLocation(location, API_KEY)
+            getCityNameFromLocationLiveData.postValue(repository.getCityNameFromLocation(location, API_KEY, context))
         }
     }
 
     var loadWeatherDataLiveData = MutableLiveData<Resource<WeatherModel>>()
-    fun loadWeatherData(cityName: String, API_KEY: String) {
-        loadWeatherDataLiveData.value = Resource.loading(null)
+    fun loadWeatherData(cityName: String, API_KEY: String, context: Context) {
+        loadWeatherDataLiveData.postValue(Resource.loading(null))
         viewModelScope.launch {
-            loadWeatherDataLiveData.value = repository.loadWeatherData(cityName, API_KEY)
+            loadWeatherDataLiveData.value = repository.loadWeatherData(cityName, API_KEY, context)
         }
     }
 

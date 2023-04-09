@@ -17,4 +17,14 @@
     <string name="set_city">Set City</string>
     <string name="please_enter_the_city_name">Please enter the city name</string>
     <string name="invalid_city_name">Invalid city name</string>
+    <string name="some_error_occurred">Some error occurred</string>
+    <string name="no_internet_unable_to_retrieve">No Internet: Unable to retrieve last saved weather report</string>
+    <string name="response_not_successful">Response not successful</string>
+    <string name="permission_denied">Permission Denied</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="IO_exception">IOException, you might not have internet connection</string>
+    <string name="Http_exception">HttpException, unexpected response</string>
+    <string name="english">en</string>
+    <string name="cannot_get_location">Cannot get location</string>
+    <string name="no_internet_showing_reports_from">No Internet: Showing weather reports from:  %1$s</string>
 </resources>

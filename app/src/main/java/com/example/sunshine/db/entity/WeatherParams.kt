@@ -14,6 +14,7 @@ data class WeatherParams(
     val pressure: String,
     val sunrise: String,
     val sunset: String,
+    val time: String,
     @PrimaryKey(autoGenerate = true)
     val id: Long =0L
 )

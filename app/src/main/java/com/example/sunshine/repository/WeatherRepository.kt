@@ -4,10 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Location
 import androidx.lifecycle.MutableLiveData
+import com.example.sunshine.R
 import com.example.sunshine.db.SunshineDatabase
 import com.example.sunshine.db.entity.WeatherParams
 import com.example.sunshine.model.WeatherModel
-import com.example.sunshine.service.RetrofitInstance
+import com.example.sunshine.service.WeatherApi
 import com.example.sunshine.utils.Resource
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
@@ -18,10 +19,10 @@ import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
 
-class WeatherRepository @Inject constructor(private val database: SunshineDatabase) {
+class WeatherRepository @Inject constructor(private val database: SunshineDatabase, private val weatherApi: WeatherApi) {
 
-    @SuppressLint("MissingPermission")
-    suspend fun getDeviceLocation(context: Context, getDeviceLocationLiveData: MutableLiveData<Resource<Location?>>) {
+    @SuppressLint("MissingPermission")  //  permissions are already granted
+    fun getDeviceLocation(context: Context, getDeviceLocationLiveData: MutableLiveData<Resource<Location?>>) {
 
         LocationServices.getFusedLocationProviderClient(context)
             .getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY,
@@ -31,41 +32,41 @@ class WeatherRepository @Inject constructor(private val database: SunshineDataba
                 })
             .addOnSuccessListener { location: Location? ->
                 if (location == null)
-                    getDeviceLocationLiveData.value = Resource.error(null, "Cannot get location")
+                    getDeviceLocationLiveData.postValue(Resource.error(null, context.getString(R.string.cannot_get_location)))
                 else {
-                    getDeviceLocationLiveData.value = Resource.success(location)
+                    getDeviceLocationLiveData.postValue(Resource.success(location))
                 }
             }
     }
 
-    suspend fun getCityNameFromLocation(location: Location?, API_KEY: String): Resource<WeatherModel> {
+    suspend fun getCityNameFromLocation(location: Location?, API_KEY: String, context: Context): Resource<WeatherModel> {
         val response = try {
-            RetrofitInstance.api.getCurrentCity(location!!.latitude.toString(), location.longitude.toString(), API_KEY, "en")
+            weatherApi.getCurrentCity(location!!.latitude.toString(), location.longitude.toString(), API_KEY, context.getString(R.string.english))
         } catch (e: IOException) {
-            return Resource.error(null, "IOException, you might not have internet connection")
+            return Resource.error(null, context.getString(R.string.IO_exception))
         } catch (e: HttpException) {
-            return Resource.error(null, "HttpException, unexpected response")
+            return Resource.error(null, context.getString(R.string.Http_exception))
         }
         return if (response.isSuccessful && response.body() != null)
             Resource.success(response.body())
         else {
-            Resource.error(null, "Response not successful")
+            Resource.error(null, context.getString(R.string.response_not_successful))
         }
     }
 
-    suspend fun loadWeatherData(cityName: String, API_KEY: String): Resource<WeatherModel> {
+    suspend fun loadWeatherData(cityName: String, API_KEY: String, context: Context): Resource<WeatherModel> {
 
         val response = try {
-            RetrofitInstance.api.getPosts(cityName, API_KEY)
+            weatherApi.getPosts(cityName, API_KEY)
         } catch (e: IOException) {
-            return Resource.error(null, "IOException, you might not have internet connection")
+            return Resource.error(null, context.getString(R.string.IO_exception))
         } catch (e: HttpException) {
-            return Resource.error(null, "HttpException, unexpected response")
+            return Resource.error(null, context.getString(R.string.Http_exception))
         }
         return if (response.isSuccessful && response.body() != null) {
             Resource.success(response.body())
         } else {
-            Resource.error(null, "Response not successful")
+            Resource.error(null, context.getString(R.string.response_not_successful))
         }
     }
 
@@ -74,7 +75,11 @@ class WeatherRepository @Inject constructor(private val database: SunshineDataba
     }
 
     suspend fun getLastWeatherFromDb(): WeatherParams? {
-        return database.weatherDao!!.getWeather()?.get(0)
+        return try {
+            database.weatherDao!!.getWeather()?.get(0)
+        } catch (exception: Exception) {
+            null
+        }
     }
 
     suspend fun clearDb() {
